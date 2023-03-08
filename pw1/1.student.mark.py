@@ -18,7 +18,7 @@ def getCourseInfo(courseNo):
         #auto put the ids        
         courseList[i][0] = i + 1
         #put the course's name 
-        courseList[i][1] = input("Enter the course's name: ")
+        courseList[i][1] = input("Enter the course number {} name: ".format(i+1))
     return courseList
 def getStudentNo():
     #loop getting the number until it is in the desired format (positive integer)
@@ -39,7 +39,7 @@ def getStudentInfo(studentNo):
         #auto put the ids        
         id= i+1
         studentList[i].append(id)
-        studentName = input("Enter the student's name: ")
+        studentName = input("Enter the student number {} name: ".format(i+1))
         studentList[i].append(studentName)
         while True:
             try:
@@ -54,14 +54,11 @@ def getStudentInfo(studentNo):
 def getStudentMarks(studentList, courseList):
     markList = [[0 for i in range (len(courseList))] for i in range (len(studentList))]
     #run through the students
-    print("course: {}; student: {}".format(len(courseList),len(studentList)))
     for i in range(len(studentList)):
         #run through the courses
-        print("lenght: {}".format(len(courseList)))
         for g in range(len(courseList)):
             try:
                 while True:
-                    print("i is: {}; g is: {}".format(i,g))
                     markList[i][g] = float(input("Input the mark of the course {} for {}: ".format(courseList[g][1],studentList[i][1])))
                     if markList[i][g] > 0:
                         break
@@ -84,6 +81,7 @@ def studentMark(studentList, courseList,markList):
         try: 
             option = int(input("Choose the student you wish to see the grade of: "))
             studentID = studentList[option-1][0] 
+            print("Student ID: {}".format(studentID))
             break
         except (ValueError,IndexError):
             continue
@@ -93,14 +91,42 @@ def studentMark(studentList, courseList,markList):
         try: 
             option = int(input("Choose the course: "))
             courseID = courseList[option-1][0] 
+            print("Course ID: {}".format(courseID))
             break
         except (ValueError,IndexError):
             continue
-    print("The mark of {} in the course {} is: {}".format(studentList[studentID-1][1],courseList[courseID-1][1],markList[studentID][courseID]))
+    print("The mark of {} in the course {} is: {}".format(studentList[studentID-1][1],courseList[courseID-1][1],markList[studentID-1][courseID-1]))
 courseNo = getCourseNo()
 courses = getCourseInfo(courseNo)
-print(len(courses))
 studentNo = getStudentNo()
 students = getStudentInfo(studentNo)
 marks = getStudentMarks(students, courses)
-studentMark(students,courses, marks)
+#the menu
+while True:
+    print("""---------------------------------------
+1.Show the student list
+2.Show the course list
+3.Check the mark of a student
+4.Exit
+""")
+    try:
+        choice = int(input("Enter a number: "))
+    except ValueError:
+        continue
+    match choice:
+        case 1: 
+            listStudents(students)
+            pause = input("Enter to continue: ")
+            print("\n-----------------------------------")
+        case 2:
+            listCourses(courses)
+            pause = input("Enter to continue: ")
+            print("\n-----------------------------------")
+        case 3:
+            studentMark(students, courses, marks)
+            pause = input("Enter to continue: ")
+            print("\n-----------------------------------")            
+        case 4: 
+            break
+        case _:
+            continue
