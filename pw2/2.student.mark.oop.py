@@ -1,5 +1,7 @@
 from datetime import datetime    
 import re
+import math
+import numpy
 #creating the student class
 class Student:
     #initializing the default id, name and DOB
@@ -62,6 +64,25 @@ class Student:
     def display(self):
         print("ID: {}; Name: {}; Birthday: {}".format(self.__id,self.__name,self.__DOB))
 
+#Creating the mark class
+class Mark:
+    def __init__(self,sID, mark):
+        self.__studentID = sID
+        self.__mark = mark
+    
+    #return the value:
+    def getSID(self):
+        return self.__studentID
+    def getMark(self):
+        return self.__mark
+
+    #Creating the setters
+    def setSID(self,ID):
+        self.__studentID = ID
+    def setMark(self,mark):
+        self.__mark = mark
+
+#Creating the course class
 class Course:
     def __init__(self, id, name):
         self.__id = id
@@ -93,38 +114,38 @@ class Course:
         studentID = student.getID()
         mark = -1
         #make sure that the mark is of the correct format
-        while mark <0 or mark >10: 
+        while mark <0 or mark >20: 
             try: 
-                mark = float(input("Enter {}-{}'s mark: ".format(student.getID(), student.getName())))
+                mark = float(input("Enter {}: {}'s mark: ".format(student.getID(), student.getName())))
             except ValueError:
                 continue
-        #adding the dictionary with the student's info        
+        #constructing the mark class containing the mark info        
         if len(self.__mark) > 0:
             #if mark is not empty check to see if the student already had a grade and just replace it
             try:
                 for i in self.__mark:
-                    if i['ID'] == studentID:
-                        i['mark'] = mark
-                        return
+                    if i.getSID == studentID:
+                        i.setMark(mark)
+                        return True
             except KeyError:
-                self.__mark.append({'ID': studentID, 'mark': mark})
-                return
+                self.__mark.append(Mark(studentID, mark))
+                return True
         #creating a new entry for a student
-        self.__mark.append({'ID': studentID, 'mark': mark})
+        self.__mark.append(Mark(studentID, mark))
+        return True
 
     #function to check the mark of a student
     def checkMark(self, student):
         #sift through the mark list to see if the student has a mark
         try:
             for i in self.__mark:
-                if i['ID'] == student.getID():
-                    print("The mark of {} in the course {} is: {}".format(student.getName(), self.__name, i['mark']))
-                    return
+                if i.getSID() == student.getID():
+                    print("The mark of {} in the course {} is: {}".format(student.getName(), self.__name, i.getMark()))
+                    return True
         except KeyError:
-            print("THERE IS NO MARK IN THIS COURSE")
-            return
+            return False
         #return if the student does not have a mark for this course
-        print("NOT FOUND")
+        return False
     def display(self):
         print("ID: {}; Name: {}".format(self.__id,self.__name))
 
@@ -211,7 +232,6 @@ def checkAllStudent(sList, cList):
             print("{} {}".format(i.getID(), i.getName()))
         courseID = input("Input the course's ID: ")
         for i in cList:
-            print(i.getID() == courseID)
             if i.getID() == courseID:
                 courseToCheck = i
                 break
