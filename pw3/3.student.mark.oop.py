@@ -1,5 +1,6 @@
 from datetime import datetime    
-import re
+import math
+import numpy
 #creating the student class
 class Student:
     #initializing the default id, name and DOB
@@ -7,57 +8,43 @@ class Student:
         self.__id = id
         self.__name = name
         self.__DOB = DOB
-    
-    #creating setters
-    def setID(self, ID):
-        #creating the ID pattern and check if the ID is of the correct pattern
-        idPattern = re.compile("^B[AI]\d{2}-\d{3}$")
-        if idPattern.match(ID):
-            self.__id = ID
-            return True
-        else:
-            return False
-        
-    def setName(self, name):
-        self.__name = name
-        return True
-
-    def setDOB(self, DoB):
-        try:
-            #check if the inputted DOB is of the correct format and set it
-            test = datetime.strptime(DoB,"%d-%m-%Y")
-            self.__DOB=  DoB
-            return True            
-        except (ValueError, TypeError):
-            return False
-
-    #Creating the observer
-    def getID(self):
+        self.__GPA = 0
+    #return the values of variables within the class
+    def giveID(self):
         return self.__id
     
-    def getName(self):
+    def giveName(self):
         return self.__name
     
-    def getDOB(self):
+    def giveDOB(self):
         return self.__DOB
     
-    #get user to input the values
-    def input(self):
-        while True:
-            ID = input("Input the student's ID: ")
-            if not self.setID(ID):
-                print("Wrong ID's format(BIXX-XXX) ")
-                continue
-            name = input("Input the student's name: ")
-            if not self.setName(name):
-                print("Wrong name format")
-                continue
-            DoB = input("Input the student's birthday (DD-MM-YYYY): ")
-            if not self.setDOB(DoB):
-                print("Wrong birthday's format")
-                continue
-            break
+    def giveGPA(self):
+        return self.__GPA
+    #Input the values of variables
+    def getID(self):
+        self.__id = input("Input the student's ID: ")
 
+    def getName(self):
+        self.__name = input("Enter the student's name: ")
+
+    def getDOB(self):
+        while True:
+            try:
+                self.__DOB=  input("Enter the DOB(DD-MM-YYYY): ") 
+                #check if the inputted DOB is of the correct format
+                test = datetime.strptime(self.__DOB,"%d-%m-%Y")
+                break
+            except ValueError:
+                continue
+
+    def setGPA(self,GPA):
+        self.__GPA = GPA
+    #Run all 3 function above
+    def input(self):
+        self.getID()
+        self.getName()
+        self.getDOB()
     #display the value
     def display(self):
         print("ID: {}; Name: {}; Birthday: {}".format(self.__id,self.__name,self.__DOB))
@@ -69,33 +56,33 @@ class Course:
         self.__mark = []
 
     #return the values of variables within the class
-    def getID(self):
+    def giveID(self):
         return self.__id
     
-    def getName(self):
+    def giveName(self):
         return self.__name
     
     #make the user input the values of variables within the class    
-    def setID(self,ID):
-        self.__id = ID
+    def getID(self):
+        self.__id = input("Input the course's ID: ")
 
-    def setName(self, name):
-        self.__name = name
+    def getName(self):
+        self.__name = input("Enter the course's name: ")
+
     #Run all 2 function above
     def input(self):
-        ID = input("Input the course's ID: ")
-        name = input("Input the course's name: ")
-        self.setID(ID)
-        self.setName(name)
+        self.getID()
+        self.getName()
 
     #The function to input the mark of the students
     def inputMark(self, student):
-        studentID = student.getID()
+        studentID = student.giveID()
         mark = -1
         #make sure that the mark is of the correct format
         while mark <0 or mark >10: 
             try: 
-                mark = float(input("Enter {}-{}'s mark: ".format(student.getID(), student.getName())))
+                mark = float(input("Enter {}-{}'s mark: ".format(student.giveID(), student.giveName())))
+                mark = math.floor(mark)
             except ValueError:
                 continue
         #adding the dictionary with the student's info        
@@ -117,8 +104,8 @@ class Course:
         #sift through the mark list to see if the student has a mark
         try:
             for i in self.__mark:
-                if i['ID'] == student.getID():
-                    print("The mark of {} in the course {} is: {}".format(student.getName(), self.__name, i['mark']))
+                if i['ID'] == student.giveID():
+                    print("The mark of {} in the course {} is: {}".format(student.giveName(), self.__name, i['mark']))
                     return
         except KeyError:
             print("THERE IS NO MARK IN THIS COURSE")
@@ -128,6 +115,11 @@ class Course:
     def display(self):
         print("ID: {}; Name: {}".format(self.__id,self.__name))
 
+#class for individual mark
+class Mark:
+    def __init__(self):
+        self.student = 0
+        self.course
 #the functions
 def getCourseNo():
     #loop getting the number until it is in the desired format (positive integer)
@@ -156,22 +148,22 @@ def checkStudentMark(sList, cList):
     studentToCheck = 0
     while courseToCheck == 0:
         for i in cList:
-            print("{} {}".format(i.getID(), i.getName()))
+            print("{} {}".format(i.giveID(), i.giveName()))
         courseID = input("Input the course's ID: ")
         for i in cList:
-            print(i.getID() == courseID)
-            if i.getID() == courseID:
+            print(i.giveID() == courseID)
+            if i.giveID() == courseID:
                 courseToCheck = i
                 break
         if courseToCheck == 0:
             print("Course ID not found")
     
     for i in sList:
-        print("{} {}".format(i.getID(), i.getName()))
+        print("{} {}".format(i.giveID(), i.giveName()))
     while studentToCheck == 0:
         studentID = input("Input the student's ID: ")
         for i in sList:
-            if i.getID() == studentID:
+            if i.giveID() == studentID:
                 studentToCheck = i
                 break
         if studentToCheck == 0:
@@ -182,21 +174,21 @@ def inputStudentMark(sList, cList):
     courseToCheck = 0
     studentToCheck = 0    
     for i in cList:
-        print("{} {}".format(i.getID(), i.getName()))
+        print("{} {}".format(i.giveID(), i.giveName()))
     while courseToCheck == 0:
         courseID = input("Input the course's ID: ")
         for i in cList:
-            if i.getID() == courseID:
+            if i.giveID() == courseID:
                 courseToCheck = i
                 break
         if courseToCheck == 0:
             print("Course ID not found")
     for i in sList:
-        print("{} {}".format(i.getID(), i.getName()))
+        print("{} {}".format(i.giveID(), i.giveName()))
     while studentToCheck == 0:
         studentID = input("Input the student's ID: ")
         for i in sList:
-            if i.getID() == studentID:
+            if i.giveID() == studentID:
                 studentToCheck = i
                 break
         if studentToCheck == 0:
@@ -208,11 +200,11 @@ def checkAllStudent(sList, cList):
     courseToCheck = 0
     while courseToCheck == 0:
         for i in cList:
-            print("{} {}".format(i.getID(), i.getName()))
+            print("{} {}".format(i.giveID(), i.giveName()))
         courseID = input("Input the course's ID: ")
         for i in cList:
-            print(i.getID() == courseID)
-            if i.getID() == courseID:
+            print(i.giveID() == courseID)
+            if i.giveID() == courseID:
                 courseToCheck = i
                 break
         if courseToCheck == 0:
@@ -225,11 +217,11 @@ def inputAllStudents(sList, cList):
     courseToCheck = 0
     studentToCheck = 0    
     for i in cList:
-        print("{} {}".format(i.getID(), i.getName()))
+        print("{} {}".format(i.giveID(), i.giveName()))
     while courseToCheck == 0:
         courseID = input("Input the course's ID: ")
         for i in cList:
-            if i.getID() == courseID:
+            if i.giveID() == courseID:
                 courseToCheck = i
                 break
         if courseToCheck == 0:
@@ -304,5 +296,5 @@ while True:
 #        i.inputMark(g)
 #for i in courseList:
 #    for g in studentList:
-#        print("{}'s mark for the course is: {}".format(g.getName(), i.checkMark(g)))
+#        print("{}'s mark for the course is: {}".format(g.giveName(), i.checkMark(g)))
 #I AM IN PAINAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
