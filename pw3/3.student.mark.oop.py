@@ -1,7 +1,7 @@
 from datetime import datetime    
 import re
 import math
-import numpy
+import numpy as np
 #creating the student class
 class Student:
     #initializing the default id, name and DOB
@@ -9,7 +9,20 @@ class Student:
         self.__id = id
         self.__name = name
         self.__DOB = DOB
+        self.__GPA = -1
     
+    #compare students based on their GPA:
+    def __lt__(self, other):
+        return self.__GPA < other.getGPA()
+   
+    def __gt__(self, other):
+        return self.__GPA > other.getGPA()
+   
+    def __eq__(self, other):
+        try:
+            return self.__GPA == other.getGPA()
+        except:
+            return False
     #creating setters
     def setID(self, ID):
         #creating the ID pattern and check if the ID is of the correct pattern
@@ -43,6 +56,12 @@ class Student:
     def getDOB(self):
         return self.__DOB
     
+    def getGPA(self):
+        if self.__GPA >= 0:
+            return self.__GPA
+        else:
+            return 0
+        
     #get user to input the values
     def input(self):
         while True:
@@ -60,15 +79,37 @@ class Student:
                 continue
             break
 
+    #Function to calculate GPA ?
+    def calcGPA(self, cList):
+        marks = np.array([])
+        for i in cList:
+            for g in i.getMarkList():
+                if g.getSID() == self.__id:
+                    marks = np.append(marks, [g.getMark()])
+                    break
+        GPA = np.average(marks)
+        self.__GPA = GPA
+        return True
+
+
     #display the value
     def display(self):
-        print("ID: {}; Name: {}; Birthday: {}".format(self.__id,self.__name,self.__DOB))
+        print("ID: {}; Name: {}; Birthday: {}; GPA: {}".format(self.__id,self.__name,self.__DOB, self.getGPA()))
 
 #Creating the mark class
 class Mark:
     def __init__(self,sID, mark):
         self.__studentID = sID
         self.__mark = mark
+    #function for comparison
+    def __lt__(self, other):
+        return self.__mark < other.getMark()
+   
+    def __gt__(self, other):
+        return self.__mark > other.getMark()
+   
+    def __eq__(self, other):
+        return self.__mark == other.getMark()
     
     #return the value:
     def getSID(self):
@@ -81,7 +122,7 @@ class Mark:
         self.__studentID = ID
     def setMark(self,mark):
         self.__mark = mark
-
+    
 #Creating the course class
 class Course:
     def __init__(self, id, name):
@@ -96,12 +137,16 @@ class Course:
     def getName(self):
         return self.__name
     
+    def getMarkList(self):
+        return self.__mark
+    
     #make the user input the values of variables within the class    
     def setID(self,ID):
         self.__id = ID
 
     def setName(self, name):
         self.__name = name
+
     #Run all 2 function above
     def input(self):
         ID = input("Input the course's ID: ")
@@ -117,6 +162,7 @@ class Course:
         while mark <0 or mark >20: 
             try: 
                 mark = float(input("Enter {}: {}'s mark: ".format(student.getID(), student.getName())))
+                mark = math.floor(mark*10)/10
             except ValueError:
                 continue
         #constructing the mark class containing the mark info        
@@ -124,7 +170,7 @@ class Course:
             #if mark is not empty check to see if the student already had a grade and just replace it
             try:
                 for i in self.__mark:
-                    if i.getSID == studentID:
+                    if i.getSID() == studentID:
                         i.setMark(mark)
                         return True
             except KeyError:
@@ -161,6 +207,11 @@ def getCourseNo():
             continue
     return courseNo
 
+#sort student list based on GPA
+def sortStudentList(sList):
+    return np.sort(sList)
+
+#get number of students
 def getStudentNo():
     #loop getting the number until it is in the desired format (positive integer)
     while True: 
@@ -180,7 +231,6 @@ def checkStudentMark(sList, cList):
             print("{} {}".format(i.getID(), i.getName()))
         courseID = input("Input the course's ID: ")
         for i in cList:
-            print(i.getID() == courseID)
             if i.getID() == courseID:
                 courseToCheck = i
                 break
@@ -196,7 +246,7 @@ def checkStudentMark(sList, cList):
                 studentToCheck = i
                 break
         if studentToCheck == 0:
-            print("Student ID not found")
+            print("This student doesn't have a mark in this course")
     courseToCheck.checkMark(studentToCheck)
 #Input the mark of a singular student
 def inputStudentMark(sList, cList):
@@ -221,9 +271,9 @@ def inputStudentMark(sList, cList):
                 studentToCheck = i
                 break
         if studentToCheck == 0:
-            print("Student ID not found")
+            print("Wrong ID")
     courseToCheck.inputMark(studentToCheck)
-
+    studentToCheck.calcGPA(cList)
 #check the mark of all student in a chosen course
 def checkAllStudent(sList, cList):
     courseToCheck = 0
@@ -256,6 +306,8 @@ def inputAllStudents(sList, cList):
             print("Course ID not found")
     for i in sList:
         courseToCheck.inputMark(i)
+        i.calcGPA(cList)
+
 
 #Initializing the student lists 
 studentNo = getStudentNo()
@@ -271,6 +323,7 @@ for i in studentList:
    i.input()  
 for i in courseList:
    i.input()
+studentList = np.array(studentList)
 #the menu
 while True:
     print("""---------------------------------------
@@ -308,10 +361,12 @@ while True:
                          
         case 5:
             inputStudentMark(studentList,courseList)
+            studentList = sortStudentList(studentList)
             pause = input("Enter to continue: ")
             print("\n-----------------------------------")  
         case 6:
             inputAllStudents(studentList,courseList)
+            studentList = sortStudentList(studentList)
             pause = input("Enter to continue: ")
             print("\n-----------------------------------")          
         case 7: 
