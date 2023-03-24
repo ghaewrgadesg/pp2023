@@ -4,6 +4,7 @@ import math
 import numpy as np
 import curses
 from curses import wrapper
+from curses.textpad import Textbox, rectangle
 #creating the student class
 class Student:
     #initializing the default id, name and DOB
