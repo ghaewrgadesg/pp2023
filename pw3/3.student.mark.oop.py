@@ -2,6 +2,8 @@ from datetime import datetime
 import re
 import math
 import numpy as np
+import curses
+from curses import wrapper
 #creating the student class
 class Student:
     #initializing the default id, name and DOB
@@ -94,7 +96,7 @@ class Student:
 
     #display the value
     def display(self):
-        print("ID: {}; Name: {}; Birthday: {}; GPA: {}".format(self.__id,self.__name,self.__DOB, self.getGPA()))
+        return "ID: {} - Name: {} - Birthday: {} - GPA: {}".format(self.__id,self.__name,self.__DOB, self.getGPA())
 
 #Creating the mark class
 class Mark:
@@ -193,7 +195,7 @@ class Course:
         #return if the student does not have a mark for this course
         return False
     def display(self):
-        print("ID: {}; Name: {}".format(self.__id,self.__name))
+        return "ID: {} - Name: {}".format(self.__id,self.__name)
 
 #the functions
 def getCourseNo():
@@ -222,32 +224,86 @@ def getStudentNo():
         except ValueError:
             continue
     return studentNo
+
 #check the mark of a singular student
 def checkStudentMark(sList, cList):
-    courseToCheck = 0
     studentToCheck = 0
+    courseToCheck = 0
+    stdscr = curses.initscr()
+    stdscr.refresh()
+    line = 0
+    #wrapper stuffs
+    curses.cbreak()
+    stdscr.keypad(1)
+    curses.noecho()
+    #end of wrapper stuffs
     while courseToCheck == 0:
         for i in cList:
-            print("{} {}".format(i.getID(), i.getName()))
-        courseID = input("Input the course's ID: ")
+            stdscr.addstr(line, 0, "{} {}".format(i.getID(), i.getName()))
+            line += 1
+        stdscr.refresh()
+        line += 1
+        stdscr.addstr(line, 0, "Input the course's ID: ")
+        line += 2
+        tBoxWin = curses.newwin(1, 10, line ,2)
+        tBox = Textbox(tBoxWin)
+        rectangle(stdscr,line-1,1, line + 1, 12)
+        line += 2
+        stdscr.refresh()
+        tBox.edit()
+        courseID = tBox.gather().rstrip()
         for i in cList:
             if i.getID() == courseID:
                 courseToCheck = i
                 break
         if courseToCheck == 0:
-            print("Course ID not found")
-    
-    for i in sList:
-        print("{} {}".format(i.getID(), i.getName()))
+            stdscr.addstr(line, 0, "Course ID not found")
+            line = 0
+            stdscr.getch()
+            stdscr.erase()
+    stdscr.erase()
+    line = 0
+    stdscr.refresh()        
     while studentToCheck == 0:
-        studentID = input("Input the student's ID: ")
+        for i in sList:
+            stdscr.addstr(line, 0, "{} {}".format(i.getID(), i.getName()))
+            line += 1
+        stdscr.refresh()
+        line += 1
+        stdscr.addstr(line, 0, "Input the student's ID: ")
+        line += 2
+        tBoxWin = curses.newwin(1, 10, line ,2)
+        tBox = Textbox(tBoxWin)
+        rectangle(stdscr,line-1,1, line + 1, 12)
+        line += 2
+        stdscr.refresh()
+        tBox.edit()
+        studentID = tBox.gather().rstrip()
         for i in sList:
             if i.getID() == studentID:
                 studentToCheck = i
                 break
         if studentToCheck == 0:
-            print("This student doesn't have a mark in this course")
-    courseToCheck.checkMark(studentToCheck)
+            stdscr.addstr(line, 0, "student ID not found")
+            line = 0
+            stdscr.getch()
+            stdscr.erase()
+    stdscr.erase()
+    line = 0
+    stdscr.refresh()
+    if courseToCheck.checkMark(studentToCheck):         
+        stdscr.addstr(line, 0, courseToCheck.checkMark(studentToCheck))
+    line += 1
+    stdscr.addstr(line, 0, "\nPress any key to continue...", curses.A_BOLD)
+    stdscr.getch()
+    stdscr.erase()
+    #wrapper stuffs
+    curses.nocbreak()
+    stdscr.keypad(0)
+    curses.echo()
+    #end of wrapper
+    curses.endwin()
+
 #Input the mark of a singular student
 def inputStudentMark(sList, cList):
     courseToCheck = 0
@@ -274,21 +330,60 @@ def inputStudentMark(sList, cList):
             print("Wrong ID")
     courseToCheck.inputMark(studentToCheck)
     studentToCheck.calcGPA(cList)
+
+#check the mark of all student in a chosen course
 #check the mark of all student in a chosen course
 def checkAllStudent(sList, cList):
     courseToCheck = 0
+    stdscr = curses.initscr()
+    stdscr.refresh()
+    line = 0
+    #wrapper stuffs
+    curses.cbreak()
+    stdscr.keypad(1)
+    curses.noecho()
+    #end of wrapper stuffs
     while courseToCheck == 0:
         for i in cList:
-            print("{} {}".format(i.getID(), i.getName()))
-        courseID = input("Input the course's ID: ")
+            stdscr.addstr(line, 0, "{} {}".format(i.getID(), i.getName()))
+            line += 1
+        stdscr.refresh()
+        line += 1
+        stdscr.addstr(line, 0, "Input the course's ID: ")
+        line += 2
+        tBoxWin = curses.newwin(1, 10, line ,2)
+        tBox = Textbox(tBoxWin)
+        rectangle(stdscr,line-1,1, line + 1, 12)
+        line += 2
+        stdscr.refresh()
+        tBox.edit()
+        courseID = tBox.gather().rstrip()
         for i in cList:
             if i.getID() == courseID:
                 courseToCheck = i
                 break
         if courseToCheck == 0:
-            print("Course ID not found")
+            stdscr.addstr(line, 0, "Course ID not found")
+            line = 0
+            stdscr.erase()
+    stdscr.erase()
+    line = 0
+    stdscr.refresh()        
+    stdscr.addstr(line, 0, "Students' Marks for {}: ".format(courseToCheck.getName()))
+    line += 1
     for i in sList:
-        courseToCheck.checkMark(i)
+        if courseToCheck.checkMark(i):
+            stdscr.addstr(line, 0, courseToCheck.checkMark(i))
+            line += 1
+    stdscr.addstr(line, 0, "\nPress any key to continue...", curses.A_BOLD)
+    stdscr.getch()
+    stdscr.erase()
+    #wrapper stuffs
+    curses.nocbreak()
+    stdscr.keypad(0)
+    curses.echo()
+    #end of wrapper stuffs
+    curses.endwin()
 
 #input the mark of all students in a chosen course
 def inputAllStudents(sList, cList):
@@ -308,6 +403,39 @@ def inputAllStudents(sList, cList):
         courseToCheck.inputMark(i)
         i.calcGPA(cList)
 
+#display the students using curse
+def displayStudents(sList):
+    # Initialize the screen
+    stdscr = curses.initscr()
+    stdscr.refresh()
+    stdscr.addstr('Student list:')
+    line = 1
+    for i in sList:
+        stdscr.addstr(line, 0, i.display())
+        line = line + 1
+
+    stdscr.refresh()
+
+    stdscr.addstr(line, 0, "\nPress any key to continue...", curses.A_BOLD)
+    stdscr.getch()
+    curses.endwin()
+
+#display the courses using curses
+def displayCourses(cList):
+    # Initialize the screen
+    stdscr = curses.initscr()
+    stdscr.refresh()
+    stdscr.addstr('Course list:')
+    line = 1
+    for i in cList:
+        stdscr.addstr(line, 0, i.display())
+        line = line + 1
+
+    stdscr.refresh()
+
+    stdscr.addstr(line, 0, "\nPress any key to continue...", curses.A_BOLD)
+    stdscr.getch()
+    curses.endwin()
 
 #Initializing the student lists 
 studentNo = getStudentNo()
@@ -341,8 +469,7 @@ while True:
         continue
     match choice:
         case 1: 
-            for i in studentList:
-                i.display()
+            displayStudents(studentList)
             pause = input("Enter to continue: ")
             print("\n-----------------------------------")
         case 2:
