@@ -4,13 +4,10 @@ import curses
 from curses.textpad import rectangle, Textbox
 from domains import Mark, Student, Course
 from input import sortStudentList,inputStudentMark,getStudentNo,getCourseNo, inputAllStudents
-from output import  checkStudentMark, checkAllStudent, displayStudents, displayCourses
+from output import  checkStudentMark, checkAllStudent, displayStudents, displayCourses, saveMark
 
 #Initializing the student lists 
-studentNo = getStudentNo()
-courseNo = getCourseNo()
-studentList = [Student(0,0,0) for i in range(studentNo)]
-courseList = [Course(0,0) for i in range(courseNo)]
+#Loading the data
 while True:
     try:
         error = 0
@@ -76,7 +73,8 @@ while True:
 4.Check the mark of all students in a course
 5.Input the mark of a student in a course
 6.Input the mark of all students in a course
-7.Exit
+7.Save the marks of students
+8.Exit
 """)
     try:
         choice = int(input("Enter a number: "))
@@ -106,7 +104,12 @@ while True:
             studentList = sortStudentList(studentList)
             pause = input("Enter to continue: ")
             print("\n-----------------------------------")          
-        case 7: 
+        case 7:
+            saveMark(courseList)
+            print("Mark saved")            
+            pause = input("Enter to continue: ")
+            print("\n-----------------------------------")       
+        case 8: 
             break
         case _:
             continue

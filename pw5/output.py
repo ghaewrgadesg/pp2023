@@ -172,3 +172,15 @@ def displayCourses(cList):
     stdscr.getch()
     stdscr.erase()
     curses.endwin()
+
+#saving the mark to a file
+def saveMark(cList):
+    with open("Mark.txt", "w+") as f:
+        for i in cList:
+            markList = i.getMarkList()
+            for g in markList:
+                if g != markList[-1]:
+                    f.write("{},{}/".format(g.getSID(), g.getMark()))
+                else:
+                    f.write("{},{}\n".format(g.getSID(), g.getMark()))
+
