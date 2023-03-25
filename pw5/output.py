@@ -152,6 +152,7 @@ def displayStudents(sList):
 
     stdscr.addstr(line, 0, "\nPress any key to continue...", curses.A_BOLD)
     stdscr.getch()
+    stdscr.erase()
     curses.endwin()
 
 #display the courses using curses
@@ -169,4 +170,5 @@ def displayCourses(cList):
 
     stdscr.addstr(line, 0, "\nPress any key to continue...", curses.A_BOLD)
     stdscr.getch()
+    stdscr.erase()
     curses.endwin()
