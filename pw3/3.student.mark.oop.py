@@ -189,8 +189,7 @@ class Course:
         try:
             for i in self.__mark:
                 if i.getSID() == student.getID():
-                    print("The mark of {} in the course {} is: {}".format(student.getName(), self.__name, i.getMark()))
-                    return True
+                    return "The mark of {} in the course {} is: {}".format(student.getName(), self.__name, i.getMark())
         except KeyError:
             return False
         #return if the student does not have a mark for this course
@@ -471,12 +470,9 @@ while True:
     match choice:
         case 1: 
             displayStudents(studentList)
-            pause = input("Enter to continue: ")
             print("\n-----------------------------------")
         case 2:
-            for i in courseList:
-                i.display()
-            pause = input("Enter to continue: ")
+            displayCourses(courseList)
             print("\n-----------------------------------")
         case 3:
             checkStudentMark(studentList,courseList)

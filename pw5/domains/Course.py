@@ -24,6 +24,10 @@ class Course:
     def setName(self, name):
         self.__name = name
 
+    def appendMark(self, mark):
+        self.__mark.append(mark)
+
+
     #Run all 2 function above
     def input(self):
         ID = input("Input the course's ID: ")
