@@ -3,11 +3,18 @@ import numpy as np
 import curses
 from curses.textpad import rectangle, Textbox
 from domains import Mark, Student, Course
-from input import sortStudentList,inputStudentMark,getStudentNo,getCourseNo, inputAllStudents
-from output import  checkStudentMark, checkAllStudent, displayStudents, displayCourses, saveMark
-
+from input import sortStudentList,inputStudentMark,getStudentNo,getCourseNo, inputAllStudents, extractArchive, extractArchiveOne
+from output import  checkStudentMark, checkAllStudent, displayStudents, displayCourses, saveMark, addArchive, resetArchive
+import tarfile
+import os
 #Initializing the student lists 
 #Loading the data
+fileName = ["Student.txt", "Course.txt", "Mark.txt"]
+archiveName = "StudentManagementInfo.tar"
+try:
+    extractArchive(archiveName)
+except FileNotFoundError:
+    pass
 while True:
     try:
         error = 0
@@ -31,7 +38,11 @@ while True:
                 info = f.readline().rstrip().split('/')
                 for g in info:
                     markInfo = g.split(',')
-                    courseList[i].appendMark(Mark(markInfo[0], int(markInfo[1])))
+                    courseList[i].appendMark(Mark(markInfo[0], float(markInfo[1])))
+        resetArchive(archiveName)
+        addArchive(archiveName, "Student.txt")
+        addArchive(archiveName, "Course.txt")
+        addArchive(archiveName, "Mark.txt")
         break
 
     except FileNotFoundError:
@@ -55,6 +66,9 @@ while True:
                     for i in courseList:
                         f.write("{}/{}\n".format(i.getID(),i.getName())) 
             case 2:
+                resetArchive(archiveName)
+                addArchive(archiveName, "Student.txt")
+                addArchive(archiveName, "Course.txt")
                 break
 
 
@@ -106,6 +120,11 @@ while True:
             print("\n-----------------------------------")          
         case 7:
             saveMark(courseList)
+            extractArchiveOne(archiveName, "Student.txt")
+            extractArchiveOne(archiveName, "Course.txt")
+            resetArchive(archiveName)
+            for i in fileName:
+                addArchive(archiveName, i)
             print("Mark saved")            
             pause = input("Enter to continue: ")
             print("\n-----------------------------------")       

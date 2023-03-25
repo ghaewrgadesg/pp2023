@@ -1,7 +1,8 @@
 from domains import Mark, Student, Course
 import curses
 from curses.textpad import rectangle, Textbox
-
+import tarfile
+import os
 
 
 #check the mark of a singular student
@@ -183,4 +184,15 @@ def saveMark(cList):
                     f.write("{},{}/".format(g.getSID(), g.getMark()))
                 else:
                     f.write("{},{}\n".format(g.getSID(), g.getMark()))
+
+#reset the content of the archive
+def resetArchive(archiveName):
+    with tarfile.open(archiveName, "w") as tar:
+        pass
+
+#adding a file into an archive
+def addArchive(archiveName,fileName):
+    with tarfile.open(archiveName, "a") as tar:
+            tar.add(fileName)
+            os.remove(fileName)
 

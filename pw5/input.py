@@ -1,6 +1,7 @@
 from domains import Mark, Student, Course
 import math
 import numpy as np
+import tarfile
 #sortList
 def sortStudentList(sList):
     return np.sort(sList)
@@ -98,3 +99,13 @@ def getCourseNo():
         except ValueError:
             continue
     return courseNo
+
+#extracting a tar file
+def extractArchive(name):
+    with tarfile.open(name, "r") as tar:
+        tar.extractall()
+
+#extracting a specific file from an archive
+def extractArchiveOne(archiveName, fileName):
+    with tarfile.open(archiveName, "r") as tar:
+        tar.extract(fileName)
